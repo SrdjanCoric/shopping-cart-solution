@@ -38,7 +38,7 @@ const ProductForm = (props) => {
       </div>
 
       <div className="actions form-actions">
-        <a className="button" onClick={props.onSubmit}>
+        <a className="button" data-testid="submit" onClick={props.onSubmit}>
           {props.submitText}
         </a>
         {props.submitText !== "Add" ? (

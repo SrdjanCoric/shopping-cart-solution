@@ -6,11 +6,12 @@ const ShoppingCart = (props) => {
     <CartItem key={item._id} {...item} />
   ));
 
-  const calculateTotal =
+  const calculateTotal = (
     Math.round(
       props.cart.reduce((acc, item) => acc + item.price * item.quantity, 0) *
         100
-    ) / 100;
+    ) / 100
+  ).toFixed(2);
   return (
     <header>
       <h1>The Shop!</h1>
