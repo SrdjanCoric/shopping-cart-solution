@@ -13,8 +13,7 @@ const EditProductForm = (props) => {
       price,
       quantity,
     };
-    props.onUpdateProduct(editedProduct, props.product._id);
-    props.onToggleEdit();
+    props.onUpdateProduct(editedProduct, props.product._id, props.onToggleEdit);
   };
 
   const handleInputChange = (e) => {
@@ -48,7 +47,6 @@ const EditProductForm = (props) => {
         price={price}
         quantity={quantity}
         onInputChange={handleInputChange}
-        setQuantity={setQuantity}
         onSubmit={handleSubmit}
         submitText="Update"
         onCancelClick={handleCancelClick}

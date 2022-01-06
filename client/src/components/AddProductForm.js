@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import axios from "axios";
 import ProductForm from "./ProductForm";
 
 const AddProductForm = (props) => {
@@ -6,6 +8,7 @@ const AddProductForm = (props) => {
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState("");
   const [visible, setVisible] = useState(false);
+  const dispatch = useDispatch();
 
   const handleToggleAddForm = () => {
     setVisible(!visible);
@@ -20,9 +23,14 @@ const AddProductForm = (props) => {
       quantity,
     };
 
-    props.onAddProduct(product);
-    handleToggleAddForm();
-    resetState();
+    axios
+      .post(`/api/products`, product)
+      .then((response) => response.data)
+      .then((newProduct) => {
+        dispatch({ type: "PRODUCT_ADDED", payload: newProduct });
+        handleToggleAddForm();
+        resetState();
+      });
   };
 
   const handleInputChange = (e) => {
