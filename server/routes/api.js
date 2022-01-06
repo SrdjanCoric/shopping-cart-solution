@@ -36,6 +36,24 @@ router.put("/products/:id", (req, res) => {
     });
 });
 
+// router.patch("/products/:id/", (req, res) => {
+//   const productId = req.params.id;
+//   Product.findById(productId)
+//     .then((product) => {
+//       if (product.quantity === 0) res.json(product);
+//       return Product.findByIdAndUpdate(
+//         productId,
+//         {
+//           quantity: product.quantity - 1,
+//         },
+//         { new: true }
+//       );
+//     })
+//     .then((updatedProduct) => {
+//       res.json(updatedProduct);
+//     });
+// });
+
 router.delete("/products/:id", (req, res, next) => {
   const productId = req.params.id;
   Product.findByIdAndRemove(productId)
@@ -45,35 +63,83 @@ router.delete("/products/:id", (req, res, next) => {
     .catch((err) => next(err));
 });
 
-router.post("/cart", (req, res) => {
-  const { productId, title, price } = req.body;
-  CartItem.findOne({
-    productId,
-  })
-    .then((item) => {
-      if (!item) {
-        return CartItem.create({
-          title: title,
-          price: price,
-          quantity: 1,
-          productId,
-        });
-      } else {
-        return CartItem.findOneAndUpdate(
-          { productId },
-          {
-            quantity: item.quantity + 1,
-          },
-          { new: true }
-        );
+router.post("/add-to-cart", (req, res, next) => {
+  const { productId } = req.body;
+  Product.findById(productId)
+    .then((product) => {
+      if (product.quantity === 0) {
+        product.error = "No more items";
+        return product;
       }
+      return Product.findByIdAndUpdate(
+        productId,
+        {
+          quantity: product.quantity - 1,
+        },
+        { new: true }
+      );
     })
-    .then((item) => {
-      res.json(item);
+    .then((updatedProduct) => {
+      CartItem.findOne({
+        productId,
+      })
+        .then((item) => {
+          if (updatedProduct.error) {
+            return item;
+          }
+          if (!item) {
+            return CartItem.create({
+              title: updatedProduct.title,
+              price: updatedProduct.price,
+              quantity: 1,
+              productId,
+            });
+          } else {
+            return CartItem.findOneAndUpdate(
+              { productId },
+              {
+                quantity: item.quantity + 1,
+              },
+              { new: true }
+            );
+          }
+        })
+        .then((item) => {
+          const { error, ...product } = updatedProduct;
+          res.json({ product, item });
+        });
     });
 });
 
-router.post("/cart/checkout", (req, res) => {
+// router.post("/cart", (req, res) => {
+//   const { productId, title, price } = req.body;
+//   CartItem.findOne({
+//     productId,
+//   })
+//     .then((item) => {
+//       if (!item) {
+//         return CartItem.create({
+//           title: title,
+//           price: price,
+//           quantity: 1,
+//           productId,
+//         });
+//       } else {
+//         return CartItem.findOneAndUpdate(
+//           { productId },
+//           {
+//             quantity: item.quantity + 1,
+//           },
+//           { new: true }
+//         );
+//       }
+//     })
+//     .then((item) => {
+//       res.json(item);
+//     });
+// });
+
+router.post("/checkout", (req, res) => {
   CartItem.deleteMany({}).then(() => {
     res.json();
   });
@@ -81,7 +147,9 @@ router.post("/cart/checkout", (req, res) => {
 
 router.get("/cart", (req, res, next) => {
   CartItem.find({})
-    .then((cartItems) => res.json(cartItems))
+    .then((cartItems) => {
+      res.json(cartItems);
+    })
     .catch(next);
 });
 
