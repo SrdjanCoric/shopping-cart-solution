@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
 import EditableProduct from "./EditableProduct";
+import { fetchProductsAction } from "../actions/productActions";
 
 const ProductListing = () => {
   const dispatch = useDispatch();
@@ -9,12 +9,7 @@ const ProductListing = () => {
   const products = useSelector((state) => state.products);
 
   useEffect(() => {
-    axios
-      .get("/api/products")
-      .then((response) => response.data)
-      .then((products) => {
-        dispatch({ type: "PRODUCTS_RECEIVED", payload: products });
-      });
+    dispatch(fetchProductsAction());
   }, [dispatch]);
 
   const editableProducts = products.map((product) => (

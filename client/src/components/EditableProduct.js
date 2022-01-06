@@ -1,53 +1,31 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import axios from "axios";
+import {
+  updateProductAction,
+  deleteProductAction,
+  addProductToCartAction,
+} from "../actions/productActions";
+import { addToCartAction } from "../actions/cartActions";
 import EditProductForm from "./EditProductForm";
 
 const EditableProduct = (props) => {
   const [editable, setEditable] = useState(false);
   const { product } = props;
-  const [updating, setUpdating] = useState(false);
   const isZeroQuantity = product.quantity === 0;
 
   const dispatch = useDispatch();
 
   const deleteProduct = (id) => {
-    axios
-      .delete(`/api/products/${id}`)
-      .then((response) => response.data)
-      .then(dispatch({ type: "PRODUCT_DELETED", payload: id }));
-  };
-
-  const addToCart = (product, id, callback) => {
-    setUpdating(true);
-    axios
-      .put(`/api/products/${id}`, product)
-      .then((response) => response.data)
-      .then((product) => {
-        dispatch({ type: "ADDED_TO_CART", product });
-        if (callback) {
-          callback();
-        }
-      });
+    dispatch(deleteProductAction(id));
   };
 
   const updateProduct = (product, id, callback) => {
-    axios
-      .put(`/api/products/${id}`, product)
-      .then((response) => response.data)
-      .then((updatedProduct) => {
-        dispatch({ type: "PRODUCT_UPDATED", payload: updatedProduct });
-        if (callback) {
-          callback();
-        }
-      });
+    dispatch(updateProductAction(product, id, callback));
   };
 
   const handleAddToCart = (product) => {
-    if (product.quantity === 0 || updating) return;
-    addToCart({ quantity: product.quantity - 1 }, product._id, () =>
-      setUpdating(false)
-    );
+    if (product.quantity === 0) return;
+    dispatch(addProductToCartAction(product._id));
   };
 
   const handleToggleEdit = () => {

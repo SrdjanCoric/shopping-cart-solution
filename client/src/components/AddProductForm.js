@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import axios from "axios";
+import { addProductAction } from "../actions/productActions";
 import ProductForm from "./ProductForm";
 
 const AddProductForm = (props) => {
@@ -23,14 +23,12 @@ const AddProductForm = (props) => {
       quantity,
     };
 
-    axios
-      .post(`/api/products`, product)
-      .then((response) => response.data)
-      .then((newProduct) => {
-        dispatch({ type: "PRODUCT_ADDED", payload: newProduct });
+    dispatch(
+      addProductAction(product, () => {
         handleToggleAddForm();
         resetState();
-      });
+      })
+    );
   };
 
   const handleInputChange = (e) => {

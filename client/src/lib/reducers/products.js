@@ -1,7 +1,7 @@
 export const products = (state = [], action) => {
   switch (action.type) {
     case "PRODUCTS_RECEIVED":
-      return state.concat(action.payload);
+      return action.payload;
     case "PRODUCT_DELETED":
       return state.filter((product) => product._id !== action.payload);
     case "PRODUCT_ADDED":
@@ -16,9 +16,10 @@ export const products = (state = [], action) => {
       });
     case "ADDED_TO_CART":
       return state.map((product) => {
-        if (product._id === action.product._id) {
-          const quantity = product.quantity === 0 ? 0 : product.quantity - 1;
-          return Object.assign({}, product, { quantity });
+        if (product._id === action.payload.product._id) {
+          return Object.assign({}, product, {
+            quantity: action.payload.product.quantity,
+          });
         } else {
           return product;
         }
