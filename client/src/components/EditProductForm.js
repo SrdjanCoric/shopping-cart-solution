@@ -1,10 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import ProductForm from "./ProductForm";
+import { ProductDispatchContext } from "../context/product-context";
+import apiClient from "../lib/ApiClient";
 
-const EditProductForm = (props) => {
-  const [title, setTitle] = useState(props.product.title || "");
-  const [price, setPrice] = useState(props.product.price || 0);
-  const [quantity, setQuantity] = useState(props.product.quantity || 0);
+const EditProductForm = ({ product, onToggleEdit }) => {
+  const [title, setTitle] = useState(product.title || "");
+  const [price, setPrice] = useState(product.price || 0);
+  const [quantity, setQuantity] = useState(product.quantity || 0);
+
+  const { updateProduct } = useContext(ProductDispatchContext);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -13,31 +17,34 @@ const EditProductForm = (props) => {
       price,
       quantity,
     };
-    props.onUpdateProduct(editedProduct, props.product._id);
-    props.onToggleEdit();
+    apiClient.updateProduct(product._id, editedProduct, (updatedProduct) => {
+      updateProduct(updatedProduct);
+      onToggleEdit();
+    });
   };
 
   const handleInputChange = (e) => {
-    const name = e.target.name;
-    const value = e.target.value;
+    const target = e.target;
+    const name = target.name;
+    const value = target.value;
     switch (name) {
       case "title":
         setTitle(value);
         break;
       case "price":
-        setPrice(value);
+        setPrice(+value);
         break;
       case "quantity":
-        setQuantity(value);
+        setQuantity(+value);
         break;
     }
   };
 
   const handleCancelClick = () => {
-    setTitle(props.product.title);
-    setPrice(props.product.price);
-    setQuantity(props.product.quantity);
-    props.onToggleEdit();
+    setTitle(product.title);
+    setPrice(product.price);
+    setQuantity(product.quantity);
+    onToggleEdit();
   };
 
   return (

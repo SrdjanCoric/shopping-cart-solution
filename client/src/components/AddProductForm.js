@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import ProductForm from "./ProductForm";
+import { ProductDispatchContext } from "../context/product-context";
+import apiClient from "../lib/ApiClient";
 
-const AddProductForm = (props) => {
+const AddProductForm = () => {
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState("");
   const [visible, setVisible] = useState(false);
+
+  const { addProduct } = useContext(ProductDispatchContext);
 
   const handleToggleAddForm = () => {
     setVisible(!visible);
@@ -20,31 +24,34 @@ const AddProductForm = (props) => {
       quantity,
     };
 
-    props.onAddProduct(product);
-    handleToggleAddForm();
-    resetState();
+    apiClient.addProduct(product, (newProduct) => {
+      addProduct(newProduct);
+      handleToggleAddForm();
+      resetState();
+    });
   };
 
   const handleInputChange = (e) => {
-    const name = e.target.name;
-    const value = e.target.value;
+    const target = e.target;
+    const name = target.name;
+    const value = target.value;
     switch (name) {
       case "title":
         setTitle(value);
         break;
       case "price":
-        setPrice(value);
+        setPrice(+value);
         break;
       case "quantity":
-        setQuantity(value);
+        setQuantity(+value);
         break;
     }
   };
 
   const resetState = () => {
     setTitle("");
-    setPrice("");
-    setQuantity("");
+    setPrice(0);
+    setQuantity(0);
     setVisible(false);
   };
 
