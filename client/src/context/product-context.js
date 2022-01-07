@@ -67,7 +67,7 @@ export const ProductProvider = ({ children }) => {
             if (p.quantity === 0) {
               return p;
             }
-            return { ...p, quantity: p.quantity - 1 };
+            return { ...p, quantity: data.quantity };
           } else {
             return p;
           }

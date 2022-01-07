@@ -187,9 +187,7 @@ router.post("/add-to-cart", (req, res, next) => {
           }
         })
         .then((item) => {
-          console.log(updatedProduct, "updatedProduct");
-          const { error, ...product } = updatedProduct;
-          console.log(product, "product");
+          const { error, ...product } = updatedProduct.toObject();
           res.json({ product, item });
         });
     });

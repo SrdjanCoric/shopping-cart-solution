@@ -37,7 +37,7 @@ export const CartProvider = ({ children }) => {
         if (cartItem) {
           return currentItems.map((c) => {
             if (c._id === data._id) {
-              return { ...c, quantity: c.quantity + 1 };
+              return { ...c, quantity: data.quantity };
             } else {
               return c;
             }
